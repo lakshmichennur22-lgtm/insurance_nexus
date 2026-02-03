@@ -1,19 +1,36 @@
 pipeline {
     agent any
 
-
     environment {
-        NEXUS_URL  = "http://13.49.68.226:8081"
+        NEXUS_URL  = "13.49.68.226:8081"
         NEXUS_REPO = "insurance"
+        NPM_CACHE  = "${WORKSPACE}/.npm"
     }
 
     stages {
+
+        stage('Configure npm') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'nexus-creds',
+                    usernameVariable: 'NEXUS_USER',
+                    passwordVariable: 'NEXUS_PASS'
+                )]) {
+                    sh '''
+                    npm config set registry http://${NEXUS_URL}/repository/${NEXUS_REPO}/
+                    npm config set cache ${NPM_CACHE}
+                    npm config set always-auth true
+                    npm config set //${NEXUS_URL}/repository/${NEXUS_REPO}/:_authToken=$NEXUS_PASS
+                    '''
+                }
+            }
+        }
 
         stage('Install Dependencies') {
             steps {
                 sh '''
                 cd frontend
-                npm install
+                npm ci
                 '''
             }
         }
@@ -22,7 +39,7 @@ pipeline {
             steps {
                 sh '''
                 cd frontend
-                npm test
+                npm test -- --watch=false
                 '''
             }
         }
@@ -40,7 +57,7 @@ pipeline {
         stage('Build Artifact') {
             steps {
                 sh '''
-                cd frontend 
+                cd frontend
                 npm pack
                 '''
             }
@@ -48,23 +65,18 @@ pipeline {
 
         stage('Publish to Nexus') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'nexus-creds',
-                    usernameVariable: 'NEXUS_USER',
-                    passwordVariable: 'NEXUS_PASS'
-                )]) {
-                    sh """
-                    npm set registry ${NEXUS_URL}/repository/${NEXUS_REPO}/
-                    npm set //${NEXUS_URL#http://}/repository/${NEXUS_REPO}/:_auth=\$(echo -n $NEXUS_USER:$NEXUS_PASS | base64)
-
-                    npm publish *.tgz
-                    """
-                }
+                sh '''
+                cd frontend
+                npm publish *.tgz
+                '''
             }
         }
     }
 
     post {
+        always {
+            cleanWs()
+        }
         success {
             echo "✅ CI pipeline completed successfully"
         }
