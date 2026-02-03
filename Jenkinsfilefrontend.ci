@@ -19,7 +19,6 @@ pipeline {
                     sh '''
                     npm config set registry http://${NEXUS_URL}/repository/${NEXUS_REPO}/
                     npm config set cache ${NPM_CACHE}
-                    npm config set always-auth true
                     npm config set //${NEXUS_URL}/repository/${NEXUS_REPO}/:_authToken=$NEXUS_PASS
                     '''
                 }
