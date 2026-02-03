@@ -20,7 +20,7 @@ pipeline {
             steps {
                 sh '''
                 cd ${FRONTEND_DIR}
-                npm ci
+                npm install
                 '''
             }
         }
