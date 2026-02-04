@@ -29,7 +29,7 @@ pipeline {
                 echo "Uploading frontend ZIP to Nexus RAW repo"
                 curl -v -u admin:lakshmi \
                 -T frontend/frontend-build-$(Build.BuildId).zip \
-                $(NEXUS_REPO_URL)frontend-build-$(Build.BuildId).zip
+                $(NEXUS_URL)frontend-build-$(Build.BuildId).zip
                 '''
             }
         }
