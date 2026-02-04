@@ -27,6 +27,7 @@ pipeline {
             steps {
                 sh '''
                 echo "Uploading frontend ZIP to Nexus RAW repo"
+                echo "${NEXUS_URL}"
                 curl -v -u admin:lakshmi \
                 -T frontend/frontend-build-${BUILD_ID}.zip \
                 $(NEXUS_URL)frontend-build-${BUILD_ID}.zip
