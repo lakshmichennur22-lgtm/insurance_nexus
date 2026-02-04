@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        NEXUS_URL  = "http://http://13.49.68.226:8081"
-        NEXUS_REPO = "insurance"
+        NEXUS_URL  = "http://http://http://3.94.52.72/:8081"
+        NEXUS_REPO = "insurance_raw"
         FRONTEND_DIR = "frontend"
         ZIP_NAME = "frontend-build-${BUILD_NUMBER}.zip"
     }
