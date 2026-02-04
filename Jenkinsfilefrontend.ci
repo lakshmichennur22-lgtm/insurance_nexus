@@ -2,10 +2,7 @@ pipeline {
     agent any
 
     environment {
-        NEXUS_URL  = "http://http://http://3.94.52.72/:8081"
-        NEXUS_REPO = "insurance_raw"
-        FRONTEND_DIR = "frontend"
-        ZIP_NAME = "frontend-build-${BUILD_NUMBER}.zip"
+        NEXUS_URL  = "http://3.94.52.72:8081/repository/Insurance_raw/"
     }
 
     stages {
@@ -19,47 +16,24 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh '''
-                cd ${FRONTEND_DIR}
+                cd frontend
                 npm install
-                '''
-            }
-        }
-
-        stage('Build Frontend') {
-            steps {
-                sh '''
-                cd ${FRONTEND_DIR}
                 npm run build
+                zip -r frontend-build-$(Build.BuildId).zip build
                 '''
             }
         }
-
-        stage('Zip Artifact') {
+        stage('Install Dependencies') {
             steps {
                 sh '''
-                cd ${FRONTEND_DIR}
-                zip -r ${ZIP_NAME} build
-                mv ${ZIP_NAME} ..
+                echo "Uploading frontend ZIP to Nexus RAW repo"
+                curl -v -u admin:lakshmi \
+                -T frontend/frontend-build-$(Build.BuildId).zip \
+                $(NEXUS_REPO_URL)frontend-build-$(Build.BuildId).zip
                 '''
             }
         }
-
-        stage('Publish to Nexus (RAW)') {
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'nexus-creds',
-                    usernameVariable: 'NEXUS_USER',
-                    passwordVariable: 'NEXUS_PASS'
-                )]) {
-                    sh '''
-                    echo "Uploading artifact to Nexus RAW repository"
-                    curl --fail -u $NEXUS_USER:$NEXUS_PASS \
-                      --upload-file ${ZIP_NAME} \
-                      ${NEXUS_URL}/repository/${NEXUS_REPO}/frontend/${ZIP_NAME}
-                    '''
-                }
-            }
-        }
+        
     }
 
     post {
