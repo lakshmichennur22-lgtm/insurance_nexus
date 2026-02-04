@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        NEXUS_URL  = "http://3.94.52.72:8081/repository/Insurance_raw/"
+        NEXUS_URL = "http://3.94.52.72:8081/repository/Insurance_raw"
     }
 
     stages {
@@ -13,28 +13,38 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Install Dependencies & Build') {
             steps {
                 sh '''
                 cd frontend
                 npm install
                 npm run build
-                zip -r frontend-build-${BUILD_ID}.zip dist
+
+                ZIP_NAME=frontend-build-${BUILD_ID}.zip
+                zip -r $ZIP_NAME dist
+
+                echo "ZIP created:"
+                ls -lh $ZIP_NAME
                 '''
             }
         }
-        stage('uploading to nexus') {
+
+        stage('Upload to Nexus') {
             steps {
                 sh '''
                 echo "Uploading frontend ZIP to Nexus RAW repo"
-                echo "${NEXUS_URL}"
+
+                ZIP_NAME=frontend-build-${BUILD_ID}.zip
+
+                echo "Using Nexus URL: $NEXUS_URL"
+                echo "Uploading file: frontend/$ZIP_NAME"
+
                 curl -v -u admin:lakshmi \
-                -T frontend/frontend-build-${BUILD_ID}.zip \
-                $NEXUS_URLfrontend-build-${BUILD_ID}.zip
+                --upload-file frontend/$ZIP_NAME \
+                "$NEXUS_URL/$ZIP_NAME"
                 '''
             }
         }
-        
     }
 
     post {
