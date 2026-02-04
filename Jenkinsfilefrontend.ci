@@ -19,7 +19,7 @@ pipeline {
                 cd frontend
                 npm install
                 npm run build
-                zip -r frontend-build-$(Build.BuildId).zip build
+                zip -r frontend-build-$(Build.BuildId).zip dist
                 '''
             }
         }
