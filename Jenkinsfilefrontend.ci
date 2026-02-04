@@ -19,7 +19,7 @@ pipeline {
                 cd frontend
                 npm install
                 npm run build
-                zip -r frontend-build-$(Build.BuildId).zip dist
+                zip -r frontend-build-${BUILD_ID}.zip dist
                 '''
             }
         }
@@ -28,8 +28,8 @@ pipeline {
                 sh '''
                 echo "Uploading frontend ZIP to Nexus RAW repo"
                 curl -v -u admin:lakshmi \
-                -T frontend/frontend-build-$(Build.BuildId).zip \
-                $(NEXUS_URL)frontend-build-$(Build.BuildId).zip
+                -T frontend/frontend-build-${BUILD_ID}.zip \
+                $(NEXUS_URL)frontend-build-${BUILD_ID}.zip
                 '''
             }
         }
