@@ -30,7 +30,7 @@ pipeline {
                 echo "${NEXUS_URL}"
                 curl -v -u admin:lakshmi \
                 -T frontend/frontend-build-${BUILD_ID}.zip \
-                $(NEXUS_URL)frontend-build-${BUILD_ID}.zip
+                $NEXUS_URLfrontend-build-${BUILD_ID}.zip
                 '''
             }
         }
