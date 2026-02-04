@@ -23,7 +23,7 @@ pipeline {
                 '''
             }
         }
-        stage('Install Dependencies') {
+        stage('uploading to nexus') {
             steps {
                 sh '''
                 echo "Uploading frontend ZIP to Nexus RAW repo"
